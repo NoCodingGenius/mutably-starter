@@ -9,7 +9,8 @@ $(document).ready(function(){
     append: (parent, element) => parent.appendChild(element),
     ul: () => document.querySelector('.list-group'),
     form: () => document.querySelector('form'),
-    updateButton: () => document.querySelectorAll('button')
+    updateButton: () => document.querySelectorAll('button'),
+    deleteButton: () => document.querySelector('.delete-button'),
   };
 
   const UI = {
@@ -19,17 +20,21 @@ $(document).ready(function(){
           bookTitleLI = DOMELEMENTS.createNode('li'),
           releaseDateLI = DOMELEMENTS.createNode('li'),
           img = DOMELEMENTS.createNode('img'),
-          button = DOMELEMENTS.createNode('button')
+          editButton = DOMELEMENTS.createNode('button'),
+          deleteButton = DOMELEMENTS.createNode('button')
       img.src = book.image;
       authorLI.innerHTML = `${book.author}`;
       bookTitleLI.innerHTML = `${book.title}`;
       releaseDateLI.innerHTML = `${book.releaseDate}`;
-      button.innerHTML = `Edit`
+      editButton.innerHTML = `Edit`;
+      deleteButton.innerHTML = `Delete`;
+      deleteButton.className = 'delete-button';
       DOMELEMENTS.append(containerUL, img);
       DOMELEMENTS.append(containerUL, bookTitleLI);
       DOMELEMENTS.append(containerUL, authorLI);
       DOMELEMENTS.append(containerUL, releaseDateLI);
-      DOMELEMENTS.append(containerUL, button);
+      DOMELEMENTS.append(containerUL, editButton);
+      DOMELEMENTS.append(containerUL, deleteButton);
       DOMELEMENTS.append(DOMELEMENTS.ul(), containerUL);
     },
     addBooksToPage: (books) => {
@@ -58,7 +63,7 @@ $(document).ready(function(){
                $(this).text('').append($('<input />',{'value' : inputTextValue}).val(inputTextValue));
            }
            return {
-
+             //
            }
        });
     }
@@ -75,6 +80,7 @@ $(document).ready(function(){
       })
         .then(response => response.json())
         .then(data => data.books)
+        console.log(data.books._id);
     },
     createBook: () => {
       let book = UI.extractBookFromForm()
@@ -100,6 +106,16 @@ $(document).ready(function(){
         body: JSON.stringify(editedBook)
       })
       .then(response => response.json())
+    },
+    deleteBook: () => {
+      return fetch(urlWithID, {
+        method: 'DELETE',
+        mode: 'cors',
+        headers: new Headers({
+          'Content-Type': 'application/json'
+        })
+      })
+      .then(response => response.json())
     }
   };
 
@@ -119,10 +135,16 @@ $(document).ready(function(){
     },
     // updateBook: function () {
     //   UI.updateBook();
+    // },
+    // deleteBook: () => {
+    //   .then( => {
+    //
+    //   })
     // }
   };
 
   CONTROLLER.fetchAllBooks();
   DOMELEMENTS.form().addEventListener("submit", CONTROLLER.createBook);
-  $(DOMELEMENTS.ul()).on('click', 'button', UI.updateBook);
+  $(document).on('click', 'button', UI.updateBook);
+  //$(DOMELEMENTS.ul()).on('click', '.delete-button', CONTROLLER.deleteBook);
 });
